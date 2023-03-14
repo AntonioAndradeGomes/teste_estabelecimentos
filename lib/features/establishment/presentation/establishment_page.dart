@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teste_estabelecimentos/features/establishment/presentation/establishment_controller.dart';
+import 'package:teste_estabelecimentos/features/establishment/presentation/widgets/error_column.dart';
 import 'package:teste_estabelecimentos/features/establishment/presentation/widgets/general_list_widget.dart';
 import 'package:teste_estabelecimentos/features/establishment/presentation/widgets/search_widget.dart';
 
@@ -26,32 +27,10 @@ class EstablishmentPage extends StatelessWidget {
             ),
           );
         } else if (controller.pageState == HomeState.error) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Erro ao trazer a lista de estabelecimentos!',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    controller.initList();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                  child: const Text(
-                    'Tente novamente',
-                  ),
-                ),
-              ],
-            ),
+          return ErrorColumn(
+            onPressed: () {
+              controller.initList();
+            },
           );
         }
         return GestureDetector(
