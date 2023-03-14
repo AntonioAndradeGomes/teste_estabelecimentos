@@ -6,48 +6,38 @@ import 'package:teste_estabelecimentos/features/establishment/domain/usercases/g
 enum HomeState { loading, error, idle }
 
 class EstablishmentController extends GetxController {
+  //controller do movimento da ListView
   late ScrollController scrollController;
+  //controller do textfield
   TextEditingController textEditingController = TextEditingController();
+  //usecase
   GetEstablishmentsUseCase getEstablishmentsUseCase;
 
-  RxString query = ''.obs;
+  //reatividade do estado da pagina
   final Rx<HomeState> _pageState = HomeState.loading.obs;
-  final RxBool _loading = false.obs;
 
+  //lista de estabelecimentos -> retorno da api
   final RxList<EstablishmentEntity> _establishments =
       <EstablishmentEntity>[].obs;
+  //lista de estabelecimentos, incialmente retorno da api, lista filtrada
   final RxList<EstablishmentEntity> _establishmentsFiltered =
       <EstablishmentEntity>[].obs;
 
-  EstablishmentController({
-    required this.getEstablishmentsUseCase,
-  });
-
-  List<EstablishmentEntity> get establishments => _establishments.toList();
   List<EstablishmentEntity> get establishmentsFiltered =>
       _establishmentsFiltered.toList();
 
-  List<EstablishmentEntity> get listEstablishments {
-    if (query.isEmpty) {
-      return establishments;
-    }
-    return establishmentsFiltered;
-  }
-
   HomeState get pageState => _pageState.value;
-  bool get loading => _loading.value;
+
+  //construtor
+  EstablishmentController({
+    required this.getEstablishmentsUseCase,
+  });
 
   @override
   void onInit() {
     super.onInit();
     scrollController = ScrollController();
     initList();
-    debounce(
-      query,
-      (_) => _queryEstablishments(
-        queryText: query.value,
-      ),
-    );
   }
 
   Future<void> initList() async {
@@ -57,6 +47,7 @@ class EstablishmentController extends GetxController {
       result.sort((EstablishmentEntity a, EstablishmentEntity b) =>
           a.fantasyName.trim().compareTo(b.fantasyName.trim()));
       _establishments.addAll(result);
+      _establishmentsFiltered.addAll(result);
       _pageState.value = HomeState.idle;
     } catch (e) {
       print(e);
@@ -64,21 +55,19 @@ class EstablishmentController extends GetxController {
     }
   }
 
-  Future<void> _queryEstablishments({required String queryText}) async {
-    _loading.value = true;
-    if (queryText.isNotEmpty) {
-      _establishmentsFiltered.clear();
-      List<EstablishmentEntity> est = establishments
+  void filterList(String text) {
+    List<EstablishmentEntity> result = [];
+    if (text.isEmpty) {
+      result = _establishments.toList();
+    } else {
+      result = _establishments
           .toList()
-          .where((element) => element.fantasyName
-              .toLowerCase()
-              .contains(queryText.toLowerCase()))
+          .where((element) =>
+              element.fantasyName.toLowerCase().contains(text.toLowerCase()))
           .toList();
-      est.sort((EstablishmentEntity a, EstablishmentEntity b) =>
+      result.sort((EstablishmentEntity a, EstablishmentEntity b) =>
           a.fantasyName.trim().compareTo(b.fantasyName.trim()));
-      _establishmentsFiltered.addAll(est);
-      _loading.value = false;
     }
-    _loading.value = false;
+    _establishmentsFiltered.assignAll(result);
   }
 }

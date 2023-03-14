@@ -21,6 +21,15 @@ class EstablishmentRemoteDataSourceImpl extends EstablishmentRemoteDataSource {
     if (!response.containsKey('results')) {
       throw Failure.fromMap(response);
     }
+
+    if ((response['results'] as List).isEmpty) {
+      throw Failure(
+        statusCode: 500,
+        code: 'BAD_REQUEST',
+        message: 'List is empty',
+        status: 'Error',
+      );
+    }
     return (response['results'] as List)
         .map((e) => EstablishmentDto.fromMap(e))
         .toList();

@@ -31,7 +31,7 @@ class EstablishmentPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'Erro ao listar os estabelecimentos!',
+                  'Erro ao trazer a lista de estabelecimentos!',
                   style: TextStyle(
                     fontSize: 18,
                   ),
@@ -61,22 +61,18 @@ class EstablishmentPage extends StatelessWidget {
               SearchWidget(
                 textEditingController: controller.textEditingController,
                 onChanged: (text) {
-                  controller.query.value = text;
+                  controller.filterList(text);
                 },
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   controller.textEditingController.clear();
-                  controller.query.value = '';
+                  controller.filterList('');
                 },
               ),
-              if (!controller.loading)
-                Expanded(
-                  child: GeneralListWidget(
-                    elements: controller.listEstablishments,
-                    isSearching: controller.query.isNotEmpty,
-                    scrollController: controller.scrollController,
-                  ),
-                ),
+              GeneralListWidget(
+                elements: controller.establishmentsFiltered,
+                scrollController: controller.scrollController,
+              ),
             ],
           ),
         );
