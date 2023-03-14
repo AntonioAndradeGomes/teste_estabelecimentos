@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:teste_estabelecimentos/features/establishment/domain/entities/establishment_entity.dart';
 import 'package:teste_estabelecimentos/features/establishment/domain/usercases/get_establishments.dart';
 
 enum HomeState { loading, error, idle }
 
 class EstablishmentController extends GetxController {
+  late ScrollController scrollController;
   TextEditingController textEditingController = TextEditingController();
-  RxString query = ''.obs;
   GetEstablishmentsUseCase getEstablishmentsUseCase;
-  Rx<HomeState> pageState = HomeState.loading.obs;
+
+  RxString query = ''.obs;
+  final Rx<HomeState> _pageState = HomeState.loading.obs;
+  final RxBool _loading = false.obs;
 
   final RxList<EstablishmentEntity> _establishments =
       <EstablishmentEntity>[].obs;
@@ -25,9 +27,20 @@ class EstablishmentController extends GetxController {
   List<EstablishmentEntity> get establishmentsFiltered =>
       _establishmentsFiltered.toList();
 
+  List<EstablishmentEntity> get listEstablishments {
+    if (query.isEmpty) {
+      return establishments;
+    }
+    return establishmentsFiltered;
+  }
+
+  HomeState get pageState => _pageState.value;
+  bool get loading => _loading.value;
+
   @override
   void onInit() {
     super.onInit();
+    scrollController = ScrollController();
     initList();
     debounce(
       query,
@@ -39,21 +52,22 @@ class EstablishmentController extends GetxController {
 
   Future<void> initList() async {
     try {
-      pageState.value = HomeState.loading;
+      _pageState.value = HomeState.loading;
       final result = await getEstablishmentsUseCase.call();
       result.sort((EstablishmentEntity a, EstablishmentEntity b) =>
           a.fantasyName.trim().compareTo(b.fantasyName.trim()));
       _establishments.addAll(result);
-      pageState.value = HomeState.idle;
+      _pageState.value = HomeState.idle;
     } catch (e) {
       print(e);
-      pageState.value = HomeState.error;
+      _pageState.value = HomeState.error;
     }
   }
 
-  _queryEstablishments({required String queryText}) {
-    _establishmentsFiltered.clear();
+  Future<void> _queryEstablishments({required String queryText}) async {
+    _loading.value = true;
     if (queryText.isNotEmpty) {
+      _establishmentsFiltered.clear();
       List<EstablishmentEntity> est = establishments
           .toList()
           .where((element) => element.fantasyName
@@ -63,6 +77,8 @@ class EstablishmentController extends GetxController {
       est.sort((EstablishmentEntity a, EstablishmentEntity b) =>
           a.fantasyName.trim().compareTo(b.fantasyName.trim()));
       _establishmentsFiltered.addAll(est);
+      _loading.value = false;
     }
+    _loading.value = false;
   }
 }

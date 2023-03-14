@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:teste_estabelecimentos/features/establishment/presentation/establishment_controller.dart';
-import 'package:teste_estabelecimentos/features/establishment/presentation/widgets/establishment_card.dart';
+import 'package:teste_estabelecimentos/features/establishment/presentation/widgets/general_list_widget.dart';
+import 'package:teste_estabelecimentos/features/establishment/presentation/widgets/search_widget.dart';
 
 class EstablishmentPage extends StatelessWidget {
   final controller = Get.find<EstablishmentController>();
@@ -16,7 +17,7 @@ class EstablishmentPage extends StatelessWidget {
         ),
       ),
       body: Obx(() {
-        if (controller.pageState.value == HomeState.loading) {
+        if (controller.pageState == HomeState.loading) {
           return Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation(
@@ -24,7 +25,7 @@ class EstablishmentPage extends StatelessWidget {
               ),
             ),
           );
-        } else if (controller.pageState.value == HomeState.error) {
+        } else if (controller.pageState == HomeState.error) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -53,66 +54,31 @@ class EstablishmentPage extends StatelessWidget {
             ),
           );
         }
-        final list = controller.query.isEmpty
-            ? controller.establishments
-            : controller.establishmentsFiltered;
-        return Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: TextField(
-                controller: controller.textEditingController,
+        return GestureDetector(
+          onTap: FocusScope.of(context).unfocus,
+          child: Column(
+            children: [
+              SearchWidget(
+                textEditingController: controller.textEditingController,
                 onChanged: (text) {
                   controller.query.value = text;
                 },
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 20,
-                ),
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.clear,
-                      color: Theme.of(context).primaryColor,
-                      size: 20,
-                    ),
-                  ),
-                  // border: InputBorder.none,
-                  border: const OutlineInputBorder(),
-                  contentPadding: const EdgeInsets.all(10),
-                  hintText: 'Pesquisar...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey.shade500,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(
-                  16,
-                ),
-                physics: const BouncingScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: list.length,
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 300,
-                  childAspectRatio: 1,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemBuilder: (_, index) {
-                  final item = list[index];
-                  return EstablishmentCard(
-                    item: item,
-                  );
+                onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  controller.textEditingController.clear();
+                  controller.query.value = '';
                 },
               ),
-            ),
-          ],
+              if (!controller.loading)
+                Expanded(
+                  child: GeneralListWidget(
+                    elements: controller.listEstablishments,
+                    isSearching: controller.query.isNotEmpty,
+                    scrollController: controller.scrollController,
+                  ),
+                ),
+            ],
+          ),
         );
       }),
     );
