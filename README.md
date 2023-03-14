@@ -1,16 +1,35 @@
-# teste_estabelecimentos
+# Teste Estabelecimentos
 
-A new Flutter project.
+Um projeto criado em Flutter usando Getx, Clean Architecture e consumo de API.
 
-## Getting Started
+## Como usar
 
-This project is a starting point for a Flutter application.
+**Observações:**
 
-A few resources to get you started if this is your first Flutter project:
+* Tenha o Visual Studio Code instalado em sua máquina, com as extensões do Flutter; pode-se rodar sem, mas nos passos a seguir é demonstarado com eles instalados.
+* Tenha o Flutter instalado corretamente.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+**Passo 1:**
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Clone este repositório usando o comando abaixo:
+
+```
+git clone https://github.com/AntonioAndradeGomes/teste_estabelecimentos
+```
+
+**Passo 2:**
+
+Navegue ate o diretório que contém o projeto e execute o comando abaixo para obter as dependências necessárias:
+
+```
+flutter pub get
+```
+
+**Passo 3:**
+
+Abra o projeto no Visual Studio Code, selecione o emulador que deseja executar o projeto e execute o comando abaixo ou use F5 para executar:
+
+```
+flutter run
+```
+
